@@ -2,6 +2,11 @@
 
 Help with dynamic badges of Material Design.
 
+<p align="center">
+  
+  <img src="https://github.com/rdrgbaioco/dynamic_badges/blob/main/images/examples.png?raw=true" width="350" alt="accessibility text">
+</p>
+
 ## Usage `DynamicBadge`
 There's no secret, just an extension to make it easier to get the theme, screen size, scope functions, among others...
 <hr>
