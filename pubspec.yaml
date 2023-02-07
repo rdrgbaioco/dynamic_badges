@@ -1,8 +1,8 @@
 name: dynamic_badges
 description: Package being developed to help with material design badges implementation.
-version: 0.0.3
+version: 0.0.4
 homepage: https://rdrgbaioco.dev
-github: https://github.com/rdrgbaioco/dynamic_badges
+repository: https://github.com/rdrgbaioco/dynamic_badges
 
 environment:
   sdk: '>=2.18.6 <3.0.0'
