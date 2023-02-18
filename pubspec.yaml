@@ -1,7 +1,6 @@
 name: dynamic_badges
 description: Package being developed to help with material design badges implementation.
-version: 0.0.4
-homepage: https://rdrgbaioco.dev
+version: 0.0.5
 repository: https://github.com/rdrgbaioco/dynamic_badges
 
 environment:
@@ -16,7 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  very_good_analysis: ^4.0.0
 
 flutter:
   uses-material-design: true

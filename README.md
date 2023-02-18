@@ -8,7 +8,7 @@ Help with dynamic badges of Material Design.
 </p>
 
 ## Usage `DynamicBadge`
-There's no secret, just an extension to make it easier to get the theme, screen size, scope functions, among others...
+Help with material design badges implementation.
 <hr>
 
 First, you need to import the package:
