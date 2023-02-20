@@ -1,14 +1,13 @@
 # Dynamic Badges
 
-Help with dynamic badges of Material Design.
-
+Help with material design badges implementation.
+<hr>
 <p align="center">
   
   <img src="https://github.com/rdrgbaioco/dynamic_badges/blob/main/images/examples.png?raw=true" width="350" alt="accessibility text">
 </p>
 
 ## Usage `DynamicBadge`
-Help with material design badges implementation.
 <hr>
 
 First, you need to import the package:
@@ -16,7 +15,7 @@ First, you need to import the package:
 import 'package:dynamic_badges/dynamic_badges.dart';
 ```
 
-### Example:
+#### Basic example:
 ```dart
 class Example extends StatelessWidget {
   const Example({Key? key}) : super(key: key);
@@ -24,33 +23,53 @@ class Example extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicBadge(
-      label: "999",
+      label: "3",
       childSize: 92,
       child: IconButton(
-          iconSize: 92,
-          icon: const Icon(
-            Icons.chat_bubble_outline_rounded,
-          ),
-          onPressed: () {}),
+        iconSize: 92,
+        icon: const Icon(
+          Icons.chat_bubble_outline_rounded,
+        ),
+        onPressed: () {},
+      ),
     );
   }
 }
 ```
-Example with counter:
-
-### Example:
+#### Counter Example:
 ```dart
 class Example extends StatelessWidget {
   const Example({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const DynamicBadge.counter(
+    return DynamicBadge.counter(
       count: 1241,
       childSize: 92,
       child: Icon(
         Icons.chat_bubble_outline_rounded,
         size: 92,
+      ),
+    );
+  }
+}
+```
+
+#### Small Example:
+```dart
+class Example extends StatelessWidget {
+  const Example({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DynamicBadge.small(
+      childSize: 92,
+      child: IconButton(
+        iconSize: 92,
+        icon: const Icon(
+          Icons.chat_bubble_outline_rounded,
+        ),
+        onPressed: () {},
       ),
     );
   }

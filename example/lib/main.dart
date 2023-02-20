@@ -27,10 +27,31 @@ class BadgeExample extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             DynamicBadge(
-              label: "999",
+              label: "3",
               childSize: 92,
               child: IconButton(
-                //iconSize: 92,
+                iconSize: 92,
+                icon: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                ),
+                onPressed: () {},
+              ),
+            ),
+            DynamicBadge.small(
+              childSize: 92,
+              child: IconButton(
+                iconSize: 92,
+                icon: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                ),
+                onPressed: () {},
+              ),
+            ),
+            DynamicBadge.counter(
+              count: 1323,
+              childSize: 92,
+              child: IconButton(
+                iconSize: 92,
                 icon: const Icon(
                   Icons.chat_bubble_outline_rounded,
                 ),
