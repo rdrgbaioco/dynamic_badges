@@ -1,215 +1,225 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
-/// This class is used to create a badge with a label
-/// The label is limited to 4 characters, if the label is greater than 4
-/// characters the label will be truncated
-///
-class DynamicBadge extends StatelessWidget {
-  const DynamicBadge({
-    required String label,
-    required double childSize,
-    Color? textColor,
-    Color? backgroundColor,
-    AlignmentGeometry? alignment,
-    Widget? child,
+
+typedef OnWidgetSizeChange = void Function(Size size);
+
+class MeasureSizeRenderObject extends RenderProxyBox {
+  MeasureSizeRenderObject(this.onChange);
+
+  Size? oldSize;
+  OnWidgetSizeChange onChange;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+
+    final newSize = child!.size;
+    if (oldSize == newSize) return;
+
+    oldSize = newSize;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onChange(newSize);
+    });
+  }
+}
+
+class MeasureSize extends SingleChildRenderObjectWidget {
+  const MeasureSize({
+    required this.onChange,
+    required super.child,
     super.key,
-  })  : _label = label,
-        _textColor = textColor ?? Colors.white,
-        _backgroundColor = backgroundColor ?? Colors.redAccent,
-        _alignment = alignment ?? Alignment.center,
-        _childSize = childSize,
-        _child = child ?? const SizedBox(),
-        assert(label.length <= 4, 'Label must be 4 characters or less');
+  });
+
+  final OnWidgetSizeChange onChange;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return MeasureSizeRenderObject(onChange);
+  }
+
+  @override
+  void updateRenderObject(BuildContext context,
+      covariant MeasureSizeRenderObject renderObject,
+      ) {
+    renderObject.onChange = onChange;
+  }
+}
+
+enum BadgeType { small, large }
+
+class DynamicBadge extends StatefulWidget {
+  /// Constructor to create a badge with a counter,
+  /// The counter is limited to 999, if the counter is greater than 999
+  /// the label will be "999+"
+  const DynamicBadge({
+    required int count,
+    required this.child,
+    this.textColor = Colors.white,
+    this.backgroundColor = Colors.redAccent,
+    super.key,
+  }): label = count > 999 ? '999+' : '$count', type = BadgeType.large;
 
   /// Constructor to create a badge with a small size
   /// Is a badge without label, sometimes is used to indicate
   /// that the icon has a notification
-  ///
   const DynamicBadge.small({
-    required double childSize,
-    AlignmentGeometry? alignment,
-    Color? backgroundColor,
-    Widget? child,
+    required this.child,
+    this.textColor = Colors.white,
+    this.backgroundColor = Colors.redAccent,
     super.key,
-  })  : _label = '',
-        _textColor = Colors.white,
-        _childSize = childSize,
-        _alignment = alignment ?? Alignment.center,
-        _backgroundColor = backgroundColor ?? Colors.redAccent,
-        _child = child ?? const SizedBox();
+  }): label = '', type = BadgeType.small;
 
-  /// Constructor to create a badge with a counter,
-  /// The counter is limited to 999, if the counter is greater than 999
-  /// the label will be "999+"
-  ///
-  const DynamicBadge.counter({
-    required int count,
-    required double childSize,
-    Color? textColor,
-    Color? backgroundColor,
-    AlignmentGeometry? alignment,
-    Widget? child,
-    super.key,
-  })  : _label = count > 999 ? '999+' : '$count',
-        _backgroundColor = backgroundColor ?? Colors.redAccent,
-        _childSize = childSize,
-        _alignment = alignment ?? Alignment.center,
-        _textColor = textColor ?? Colors.white,
-        _child = child ?? const SizedBox();
+  final String label;
+  final Color textColor;
+  final Color backgroundColor;
+  final BadgeType type;
+  final Widget child;
 
-  final String _label;
-  final Color _textColor;
-  final Color _backgroundColor;
-  final double _childSize;
-  final AlignmentGeometry _alignment;
-  final Widget _child;
+  @override
+  State<DynamicBadge> createState() => _DynamicBadgeState();
+}
 
-  /// Get the size of the badge
-  /// The size of the badge is calculated based on the size of the icon
-  /// 80% of the size of the icon
-  ///
-  double get _sizeBadge {
-    return _childSize * 0.8;
+class _DynamicBadgeState extends State<DynamicBadge> {
+
+  Size size = Size.zero;
+  late Widget child;
+
+  Widget _buildChild() {
+    return MeasureSize(
+      child: widget.child,
+      onChange: (value) {
+        setState(() {
+          size = value;
+        });
+      },
+    );
   }
 
-  /// Returns the size of the expected difference between
-  /// the badge and the icon
-  ///
-  double get _differenceExpected => _sizeBadge - (_childSize * 0.5);
-
-  /// Returns the total size of the expected difference between the badge
-  /// and the icon
-  ///
-  double get _totalDifferenceExpected {
-    return (_differenceExpected * 2).floorToDouble();
-  }
-
-  /// Get the position of the badge case the label is not empty
-  double get _positionInitialBadge {
-    final total = _childSize + (_differenceExpected * 2).floorToDouble();
-    return total / 2;
-  }
-
-  /// Get the position of the badge case the label is empty
-  double get _positionSmallBadge {
-    final totalWidth = _childSize + (_differenceExpected * 2).floorToDouble();
-    return totalWidth * 0.70;
-  }
-
-  /// Get the font size of the badge
-  /// The font size of the badge is calculated based on
-  /// the size of the icon.
-  ///
-  double get _fontSize {
-    final total = _childSize + (_differenceExpected * 2).floorToDouble();
-    return total * 0.3;
-  }
-
-  /// Get the size of the badge based on the number of
-  /// characters in the label.
-  ///
-  Size get _getBetterSizeBadge {
-    final total = _childSize + _totalDifferenceExpected;
-
-    if (_label.length <= 1) {
-      return Size(
-        _sizeBadge,
-        _sizeBadge,
-      );
-    } else {
-      return Size(
-        (_differenceExpected * 2) + (total * 0.1) * _label.length,
-        _sizeBadge,
-      );
-    }
-  }
-
-  /// The calculation of the final maximum size is based on the sum of
-  /// the difference between half the value of the child widget and
-  /// the size of the badge (80% of the child widget size)
-  ///
-  Size get _resize {
-    final total = _childSize + _totalDifferenceExpected;
-
-    if (_label.length <= 1) {
-      return Size(
-        total,
-        total,
-      );
-    } else {
-      return Size(
-        total + (total * 0.1) * _label.length,
-        total,
-      );
+  @override
+  void didUpdateWidget(covariant DynamicBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.child != oldWidget.child) {
+      child = _buildChild();
     }
   }
 
   @override
+  void initState() {
+    child = _buildChild();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: _alignment,
-      children: [
-        Positioned(
-          left: _differenceExpected,
-          bottom: _differenceExpected,
-          child: _child,
+    switch (widget.type) {
+      case BadgeType.large:
+        return Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: size.height * 0.05,
+                horizontal: size.width * 0.30,
+              ),
+              child: child,
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              //left: (size.width * 1.5) / 2,
+              child: LargeBadge(
+                size: size,
+                value: widget.label,
+                textColor: widget.textColor,
+                backgroundColor: widget.backgroundColor,
+              ),
+            ),
+          ],
+        );
+      case BadgeType.small:
+        return Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: size.height * 0.05,
+                horizontal: size.width * 0.30,
+              ),
+              child: child,
+            ),
+            Positioned(
+              top: size.height * 0.10,
+              right: size.height * 0.30,
+              child: SmallBadge(
+                size: size,
+                backgroundColor: widget.backgroundColor,
+              ),
+            ),
+          ],
+        );
+    }
+  }
+}
+
+
+class SmallBadge extends StatelessWidget {
+  const SmallBadge({
+    required this.size,
+    this.backgroundColor = Colors.red,
+    super.key,
+  });
+
+  final Size size;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: size.height * 0.20,
+      width: size.height * 0.20,
+      alignment: Alignment.center,
+      decoration: ShapeDecoration(
+        color: backgroundColor,
+        shape: const StadiumBorder(),
+      ),
+    );
+  }
+}
+
+class LargeBadge extends StatelessWidget {
+  const LargeBadge({
+    required this.value,
+    required this.size,
+    this.textColor = Colors.white,
+    this.backgroundColor = Colors.red,
+    super.key,
+  });
+
+  final String value;
+  final Size size;
+  final Color textColor;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 4,
+      ),
+      decoration: ShapeDecoration(
+        color: backgroundColor,
+        shape: const StadiumBorder(),
+      ),
+      child: Text(
+        value,
+        textAlign: TextAlign.center,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: size.width * 0.35,
+          color: textColor,
         ),
-        SizedBox.fromSize(
-          size: _resize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              if (_label != '')
-                Positioned(
-                  left: _positionInitialBadge,
-                  bottom: _positionInitialBadge,
-                  child: Container(
-                    constraints: BoxConstraints.loose(
-                      _getBetterSizeBadge,
-                    ),
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: ShapeDecoration(
-                      color: _backgroundColor,
-                      shape: const StadiumBorder(),
-                    ),
-                    child: Baseline(
-                      baseline: _sizeBadge * 0.6,
-                      baselineType: TextBaseline.alphabetic,
-                      child: Text(
-                        _label.isEmpty ? '' : _label,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _textColor,
-                          leadingDistribution:
-                              TextLeadingDistribution.proportional,
-                          fontWeight: FontWeight.w500,
-                          fontSize: _fontSize,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              else
-                Positioned(
-                  left: _positionSmallBadge,
-                  bottom: _positionSmallBadge,
-                  child: Container(
-                    height: _childSize * 0.25,
-                    width: _childSize * 0.25,
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: ShapeDecoration(
-                      color: _backgroundColor,
-                      shape: const StadiumBorder(),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

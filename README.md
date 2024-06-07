@@ -15,7 +15,7 @@ First, you need to import the package:
 import 'package:dynamic_badges/dynamic_badges.dart';
 ```
 
-#### Basic example:
+#### Counter example:
 ```dart
 class Example extends StatelessWidget {
   const Example({Key? key}) : super(key: key);
@@ -23,38 +23,17 @@ class Example extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicBadge(
-      label: "3",
-      childSize: 92,
+      count: 1000,
       child: IconButton(
-        iconSize: 92,
-        icon: const Icon(
-          Icons.chat_bubble_outline_rounded,
-        ),
         onPressed: () {},
+        icon: const Icon(
+          Icons.groups_2_outlined,
+        ),
       ),
     );
   }
 }
 ```
-#### Counter Example:
-```dart
-class Example extends StatelessWidget {
-  const Example({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DynamicBadge.counter(
-      count: 1241,
-      childSize: 92,
-      child: Icon(
-        Icons.chat_bubble_outline_rounded,
-        size: 92,
-      ),
-    );
-  }
-}
-```
-
 #### Small Example:
 ```dart
 class Example extends StatelessWidget {
@@ -62,18 +41,12 @@ class Example extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicBadge.small(
-      childSize: 92,
-      child: IconButton(
-        iconSize: 92,
-        icon: const Icon(
-          Icons.chat_bubble_outline_rounded,
-        ),
-        onPressed: () {},
+    return const DynamicBadge.small(
+      child: Icon(
+        Icons.email,
+        size: 48,
       ),
     );
   }
 }
 ```
-
-
